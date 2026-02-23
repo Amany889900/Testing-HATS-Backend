@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel  # New Import
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-import torch
+
 
 app = FastAPI()
 
@@ -10,8 +9,8 @@ class TextRequest(BaseModel):
     text: str
 
 MODEL_NAME = "abhi099k/ai-text-detector-L0"
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
+# tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+# model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
 
 
 @app.get("/")
@@ -19,14 +18,20 @@ def read_root():
     return {"message": "Welcome to my Python FastAPI app 🚀"}
 
 @app.post("/predict")
-# 2. Use the schema as the function argument
 def predict(request: TextRequest):
-    # Access the text via request.text
+    from transformers import AutoTokenizer, AutoModelForSequenceClassification
+    import torch
+
+    MODEL_NAME = "abhi099k/ai-text-detector-L0"
+
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+    model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
+
     inputs = tokenizer(request.text, return_tensors="pt", truncation=True, max_length=512)
-    
+
     with torch.no_grad():
         outputs = model(**inputs)
-    
+
     probs = torch.softmax(outputs.logits, dim=-1)
     prediction = torch.argmax(probs, dim=-1).item()
 
