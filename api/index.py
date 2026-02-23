@@ -13,6 +13,11 @@ MODEL_NAME = "abhi099k/ai-text-detector-L0"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
 
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to my Python FastAPI app 🚀"}
+
 @app.post("/predict")
 # 2. Use the schema as the function argument
 def predict(request: TextRequest):
